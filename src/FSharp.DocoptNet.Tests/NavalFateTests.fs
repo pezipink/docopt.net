@@ -15,15 +15,17 @@ Usage:
   naval_fate mine (set|remove) <x> <y> [--moored | --drifting]
   naval_fate mine show [-md]
   naval_fate ship <name> move <x> <y> [--speed=<kn>]
+  naval_fate optionwithoutdefault [--opt=<opt>]
   naval_fate --help | -h
   naval_fate --version
-
+  
 Options:
   -h, --help      Show this screen.
   --version       Show version.
   --speed=<kn>    Speed in knots [default: 10].
   -m, --moored    Moored (anchored) mine.
   -d, --drifting  Drifting mine.
+  --opt=<opt>     Some value which doesn't have a default.
 """
 
 let expectations = [
@@ -99,6 +101,15 @@ Command 'move'
 name: shipname x:10 y:50 speed:11.55
 """
   }
+  { Arguments = ["optionwithoutdefault"]
+  ; ExpectedOutput = """Command 'optionwithoutdefault'
+"""
+  }
+  { Arguments = ["optionwithoutdefault"; "--opt=somevalue"]
+  ; ExpectedOutput = """Command 'optionwithoutdefault'
+  --opt=somevalue
+"""
+  }
   (* 
   // apparently either argument aren't supported, try NavalFate project with "-h" as argument
   { Arguments = ["-h"]
@@ -169,7 +180,11 @@ let navalFate args =
     putl "Naval Fate v0.0.0.0.0.1.0"
   else if opts |>isPresent<| longOption "help" then
     putl usage
-
+  else if opts |>isPresent<| command "optionwithoutdefault" then
+    putl "Command 'optionwithoutdefault'"
+    if opts |>isPresent<| longOption "opt" then
+      let opt : string = opts |>getArg<| longOption "opt"
+      putl "  --opt=%s" opt
   builder.ToString()
 
 [<Test>]

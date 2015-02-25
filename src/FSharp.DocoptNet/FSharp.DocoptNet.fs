@@ -91,31 +91,33 @@ let parseArguments usage (args: string array)  : Arguments =
       | _ -> failwithf "unhandled toOption %O" pattern
     )
   let toValue (NamedOption (optionName, option)) (v:ValueObject) =
-    match option with
-    | Command n -> if v.IsTrue then ArgValue.Present else ArgValue.NotPresent
-    | LongOption o
-      -> 
-      match (v.IsTrue, v.IsFalse) with
-      | true, false -> ArgValue.Present
-      | false, true -> ArgValue.NotPresent
-      | _, _ ->
-        ArgValue.Value (v.Value.ToString())
-    | Argument a
-      ->
-        if v = null then ArgValue.NotPresent
-        else
-          match v.Value with
-          | :? System.Collections.ArrayList as l 
-            -> ArgValue.MultiValue (l.Cast<ValueObject>() |> Seq.map (fun vo -> vo.Value.ToString()) |> Seq.toList)
-          | _
-            -> ArgValue.Value (v.Value.ToString())
-    | ShortOption o 
-      ->
-      match (v.IsTrue, v.IsFalse) with
-      | true, false -> ArgValue.Present
-      | false, true -> ArgValue.NotPresent
-      | _, _ -> ArgValue.Value (v.Value.ToString())
-    | _ -> failwithf "unhandled toValue %s %O" (option.GetType().Name) (option,v)
+    if v = null then ArgValue.NotPresent
+    else
+      match option with
+      | Command n -> if v.IsTrue then ArgValue.Present else ArgValue.NotPresent
+      | LongOption o
+        -> 
+        match (v.IsTrue, v.IsFalse) with
+        | true, false -> ArgValue.Present
+        | false, true -> ArgValue.NotPresent
+        | _, _ ->
+          ArgValue.Value (v.Value.ToString())
+      | Argument a
+        ->
+          if v = null then ArgValue.NotPresent
+          else
+            match v.Value with
+            | :? System.Collections.ArrayList as l 
+              -> ArgValue.MultiValue (l.Cast<ValueObject>() |> Seq.map (fun vo -> vo.Value.ToString()) |> Seq.toList)
+            | _
+              -> ArgValue.Value (v.Value.ToString())
+      | ShortOption o 
+        ->
+        match (v.IsTrue, v.IsFalse) with
+        | true, false -> ArgValue.Present
+        | false, true -> ArgValue.NotPresent
+        | _, _ -> ArgValue.Value (v.Value.ToString())
+      | _ -> failwithf "unhandled toValue %s %O" (option.GetType().Name) (option,v)
 
   let parsedResult = 
     result
