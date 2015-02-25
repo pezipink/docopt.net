@@ -110,7 +110,7 @@ namespace DocoptNet
                 .ToArray();
         }
 
-        static IEnumerable<Pattern> GetFlatPatterns(string doc)
+        internal static IEnumerable<Pattern> GetFlatPatterns(string doc)
         {
             var usageSections = ParseSection("usage:", doc);
             if (usageSections.Length == 0)
